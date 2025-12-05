@@ -9,61 +9,100 @@ import branca.colormap as cm
 # Page config
 st.set_page_config(page_title="Manifesten op de Kaart", layout="wide", initial_sidebar_state="expanded")
 
-# Custom CSS - We-Boost styling with white background and dark text
+# Custom CSS - Compact design with clear visual separation
 st.markdown("""
 <style>
-    /* Import We-Boost inspired font */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
     
-    /* Global styling */
     * {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
-    /* White background with dark text */
+    /* White background */
     .main {
         background-color: #ffffff;
         color: #2d3748;
+        padding: 0.5rem !important;
     }
     
     .stApp {
         background-color: #ffffff;
     }
     
-    /* All text dark */
+    /* VERY compact spacing */
+    .main > div {
+        padding-top: 0.3rem !important;
+        padding-bottom: 0.3rem !important;
+    }
+    
+    .element-container {
+        margin-bottom: 0.2rem !important;
+    }
+    
+    .row-widget {
+        margin-bottom: 0.2rem !important;
+    }
+    
+    /* Small text everywhere */
     p, span, div, label {
         color: #2d3748 !important;
-        font-size: 0.9rem !important;
+        font-size: 0.8rem !important;
+        line-height: 1.3 !important;
     }
     
-    /* Compact layout - no scrolling needed */
-    .main > div {
-        padding-top: 1rem;
-        padding-bottom: 0.5rem;
+    /* Title smaller */
+    h1 {
+        color: #173C2E !important;
+        font-weight: 700;
+        font-size: 1.5rem !important;
+        margin-bottom: 0.5rem !important;
+        padding: 0.8rem;
+        background-color: #E8E8E8;
+        border-left: 4px solid #358A6A;
+        border-radius: 4px;
     }
     
-    /* Tab styling - with #358A6A color */
+    h2 {
+        color: #173C2E !important;
+        font-weight: 600;
+        font-size: 0.95rem !important;
+        margin-bottom: 0.3rem !important;
+        padding: 0.4rem 0.6rem;
+        background-color: #C9DBD4;
+        border-radius: 3px;
+    }
+    
+    h3 {
+        color: #173C2E !important;
+        font-weight: 600;
+        font-size: 0.85rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
+    /* Tab styling - clear with colors */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background-color: #f7fafc;
-        padding: 8px;
-        border-radius: 8px;
+        gap: 4px;
+        background-color: #E8E8E8;
+        padding: 6px;
+        border-radius: 6px;
+        margin-bottom: 0.5rem !important;
     }
     
     .stTabs [data-baseweb="tab"] {
-        height: 45px;
-        padding: 0 24px;
+        height: 36px;
+        padding: 0 16px;
         background-color: white;
-        border-radius: 6px;
+        border-radius: 4px;
         font-weight: 600;
-        font-size: 0.95rem !important;
+        font-size: 0.8rem !important;
         color: #4a5568 !important;
-        border: 2px solid transparent;
+        border: 1px solid #D1D1D1;
     }
     
     .stTabs [data-baseweb="tab"]:hover {
-        background-color: #e6f2ef;
-        color: #358A6A !important;
+        background-color: #C9DBD4;
+        color: #173C2E !important;
+        border-color: #358A6A;
     }
     
     .stTabs [aria-selected="true"] {
@@ -72,87 +111,129 @@ st.markdown("""
         border-color: #358A6A !important;
     }
     
-    /* Title styling - dark text */
-    h1 {
-        color: #1a202c !important;
-        font-weight: 700;
-        font-size: 1.8rem !important;
-        margin-bottom: 0.8rem !important;
-    }
-    
-    h2 {
-        color: #2d3748 !important;
-        font-weight: 600;
-        font-size: 1.1rem !important;
-    }
-    
-    h3 {
-        color: #1a202c !important;
-        font-weight: 600;
-        font-size: 1rem !important;
-    }
-    
-    /* Compact expander */
+    /* Expander - very compact with visual separation */
     .streamlit-expanderHeader {
         font-weight: 600;
-        color: #2d3748 !important;
-        font-size: 0.9rem !important;
+        color: #173C2E !important;
+        font-size: 0.8rem !important;
+        padding: 0.4rem !important;
+        background-color: #C9DBD4;
+        border-radius: 4px;
+        border: 1px solid #D1D1D1;
     }
     
-    /* Checkbox styling */
+    .streamlit-expanderContent {
+        padding: 0.4rem !important;
+        background-color: #fafafa;
+        border: 1px solid #E8E8E8;
+        border-radius: 0 0 4px 4px;
+    }
+    
+    /* Checkboxes - very compact */
     .stCheckbox {
-        margin-bottom: 0.2rem !important;
+        margin-bottom: 0.15rem !important;
+        padding: 0.1rem !important;
     }
     
     .stCheckbox label {
-        font-size: 0.85rem !important;
+        font-size: 0.75rem !important;
+        padding-left: 0.3rem !important;
     }
     
-    /* Radio button styling */
+    /* Radio buttons */
+    .stRadio {
+        padding: 0.3rem !important;
+        background-color: #C9DBD4;
+        border-radius: 4px;
+        border: 1px solid #D1D1D1;
+    }
+    
     .stRadio label {
-        font-size: 0.85rem !important;
+        font-size: 0.75rem !important;
     }
     
     /* Input fields */
     input {
-        font-size: 0.9rem !important;
+        font-size: 0.75rem !important;
         color: #2d3748 !important;
+        padding: 0.3rem !important;
+        border: 1px solid #D1D1D1 !important;
     }
     
     /* Selectbox */
-    .stSelectbox label, .stSelectbox div {
-        font-size: 0.85rem !important;
-        color: #2d3748 !important;
+    .stSelectbox {
+        background-color: #fafafa;
+        padding: 0.3rem;
+        border-radius: 4px;
+        border: 1px solid #D1D1D1;
     }
     
-    /* Success/error badges for covenants */
+    .stSelectbox label {
+        font-size: 0.75rem !important;
+        font-weight: 600;
+        color: #173C2E !important;
+    }
+    
+    .stSelectbox div {
+        font-size: 0.75rem !important;
+    }
+    
+    /* Alert boxes - VERY compact */
     .stAlert {
-        padding: 0.4rem !important;
-        margin-bottom: 0.25rem !important;
-        font-size: 0.85rem !important;
+        padding: 0.25rem 0.4rem !important;
+        margin-bottom: 0.15rem !important;
+        font-size: 0.7rem !important;
+        border-radius: 3px;
     }
     
-    /* Compact spacing */
-    .element-container {
-        margin-bottom: 0.4rem !important;
+    .stSuccess {
+        background-color: #C9DBD4 !important;
+        border-left: 3px solid #358A6A !important;
     }
     
-    /* Markdown text */
+    .stError {
+        background-color: #DAC6CD !important;
+        border-left: 3px solid #173C2E !important;
+    }
+    
+    .stInfo {
+        background-color: #E8E8E8 !important;
+        border-left: 3px solid #173C2E !important;
+    }
+    
+    .stWarning {
+        background-color: #DAC6CD !important;
+    }
+    
+    /* Markdown - compact */
     .stMarkdown {
         color: #2d3748 !important;
-        font-size: 0.9rem !important;
+        font-size: 0.75rem !important;
+        margin-bottom: 0.2rem !important;
     }
     
-    /* Footer compact */
+    /* Columns with visual separation */
+    [data-testid="column"] {
+        padding: 0.5rem !important;
+        border-radius: 4px;
+    }
+    
+    [data-testid="column"]:first-child {
+        background-color: #fafafa;
+        border: 1px solid #E8E8E8;
+        margin-right: 0.5rem;
+    }
+    
+    [data-testid="column"]:last-child {
+        background-color: #fafafa;
+        border: 1px solid #E8E8E8;
+    }
+    
+    /* Footer */
     footer {
-        margin-top: 1rem !important;
+        margin-top: 0.5rem !important;
+        font-size: 0.7rem !important;
         color: #718096 !important;
-    }
-    
-    /* Info boxes */
-    .stInfo {
-        background-color: #e6f2ef !important;
-        color: #2d3748 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -167,7 +248,6 @@ if 'covenant_filter_mode' not in st.session_state:
 
 # Title - no emoji
 st.title("Manifesten op de Kaart")
-st.markdown("---")
 
 # Load dummy data
 @st.cache_data
@@ -469,8 +549,8 @@ with tab1:
                     icon=folium.Icon(color='red', icon='building', prefix='fa')
                 ).add_to(m)
         
-        # Display map - portrait dimensions (narrower, taller)
-        map_data = st_folium(m, width=600, height=700, returned_objects=["last_object_clicked"])
+        # Display map - portrait, compact to avoid black areas
+        map_data = st_folium(m, width=500, height=650, returned_objects=["last_object_clicked"])
         
         # Handle map clicks
         if map_data and map_data.get('last_object_clicked'):
@@ -486,28 +566,26 @@ with tab1:
         all_governments = list(government_covenants.keys())
         
         selected = st.selectbox(
-            "Selecteer overheid (demo):",
+            "Selecteer overheid:",
             [""] + all_governments,
-            index=0
+            index=0,
+            label_visibility="visible"
         )
         
         if selected:
-            st.markdown(f"### {selected}")
-            st.markdown("---")
-            
-            st.markdown("**Convenanten & Manifesten**")
+            st.markdown(f"**{selected}**")
             
             if selected in government_covenants:
                 signed = government_covenants[selected]
                 
-                # More compact display
+                # Very compact display
                 for covenant in covenants_list:
                     if covenant in signed:
                         st.success(f"✓ {covenant}", icon="✅")
                     else:
                         st.error(f"✗ {covenant}", icon="❌")
             else:
-                st.info("Geen convenanten gevonden")
+                st.info("Geen manifesten gevonden")
         else:
             st.info("👈 Selecteer een overheid om details te zien")
 
@@ -517,27 +595,26 @@ with tab2:
     
     with col1:
         st.subheader("Manifesten")
-        st.markdown("Selecteer één of meerdere manifesten om te zien welke overheden deze hebben ondertekend.")
         
-        # EN/OF filter mode
+        # EN/OF filter mode - more compact
         filter_mode = st.radio(
-            "Filter modus:",
+            "Filter:",
             options=["OF", "EN"],
-            help="OF: toon overheden met minimaal één geselecteerd manifest. EN: toon alleen overheden met ALLE geselecteerde manifesten."
+            help="OF: minimaal één manifest. EN: alle manifesten.",
+            horizontal=True
         )
         st.session_state.covenant_filter_mode = filter_mode
         
-        st.markdown("---")
-        
+        # Manifest checkboxes
         selected_covenants = []
         for covenant in covenants_list:
             if st.checkbox(covenant, key=f"cov_{covenant}"):
                 selected_covenants.append(covenant)
         
         if selected_covenants:
-            st.success(f"{len(selected_covenants)} manifest(en) geselecteerd")
+            st.success(f"{len(selected_covenants)} geselecteerd")
         else:
-            st.info("Geen manifesten geselecteerd")
+            st.info("Geen selectie")
     
     with col2:
         st.subheader("Aangesloten overheden")
@@ -622,8 +699,8 @@ with tab2:
                     )
                 ).add_to(m2)
             
-            # Display map - portrait dimensions
-            st_folium(m2, width=700, height=700)
+            # Display map - compact portrait
+            st_folium(m2, width=650, height=650)
             
             # Show list of matching governments
             if matching_govs:
@@ -637,6 +714,5 @@ with tab2:
         else:
             st.info("👈 Selecteer een of meerdere manifesten om aangesloten overheden te zien")
 
-# Footer
-st.markdown("---")
-st.caption("Demo versie - Manifesten op de Kaart | Fase 0")
+# Footer - compact
+st.caption("Demo v0.4 | Manifesten op de Kaart")
