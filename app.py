@@ -9,7 +9,7 @@ import branca.colormap as cm
 # Page config
 st.set_page_config(page_title="Manifesten op de Kaart", layout="wide", initial_sidebar_state="expanded")
 
-# Custom CSS - We-Boost styling with white background
+# Custom CSS - We-Boost styling with white background and dark text
 st.markdown("""
 <style>
     /* Import We-Boost inspired font */
@@ -20,13 +20,20 @@ st.markdown("""
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
-    /* White background */
+    /* White background with dark text */
     .main {
         background-color: #ffffff;
+        color: #2d3748;
     }
     
     .stApp {
         background-color: #ffffff;
+    }
+    
+    /* All text dark */
+    p, span, div, label {
+        color: #2d3748 !important;
+        font-size: 0.9rem !important;
     }
     
     /* Compact layout - no scrolling needed */
@@ -35,10 +42,10 @@ st.markdown("""
         padding-bottom: 0.5rem;
     }
     
-    /* Tab styling - clearer distinction */
+    /* Tab styling - with #358A6A color */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
-        background-color: #f8f9fa;
+        background-color: #f7fafc;
         padding: 8px;
         border-radius: 8px;
     }
@@ -49,66 +56,103 @@ st.markdown("""
         background-color: white;
         border-radius: 6px;
         font-weight: 600;
-        color: #495057;
+        font-size: 0.95rem !important;
+        color: #4a5568 !important;
         border: 2px solid transparent;
     }
     
     .stTabs [data-baseweb="tab"]:hover {
-        background-color: #e9ecef;
-        color: #212529;
+        background-color: #e6f2ef;
+        color: #358A6A !important;
     }
     
     .stTabs [aria-selected="true"] {
-        background-color: #0066cc !important;
+        background-color: #358A6A !important;
         color: white !important;
-        border-color: #0066cc !important;
+        border-color: #358A6A !important;
     }
     
-    /* Title styling */
+    /* Title styling - dark text */
     h1 {
-        color: #212529;
+        color: #1a202c !important;
         font-weight: 700;
-        font-size: 2rem !important;
-        margin-bottom: 1rem !important;
+        font-size: 1.8rem !important;
+        margin-bottom: 0.8rem !important;
     }
     
     h2 {
-        color: #495057;
+        color: #2d3748 !important;
         font-weight: 600;
-        font-size: 1.3rem !important;
+        font-size: 1.1rem !important;
     }
     
     h3 {
-        color: #212529;
+        color: #1a202c !important;
         font-weight: 600;
-        font-size: 1.1rem !important;
+        font-size: 1rem !important;
     }
     
     /* Compact expander */
     .streamlit-expanderHeader {
         font-weight: 600;
-        color: #495057;
+        color: #2d3748 !important;
+        font-size: 0.9rem !important;
     }
     
     /* Checkbox styling */
     .stCheckbox {
-        margin-bottom: 0.3rem !important;
+        margin-bottom: 0.2rem !important;
+    }
+    
+    .stCheckbox label {
+        font-size: 0.85rem !important;
+    }
+    
+    /* Radio button styling */
+    .stRadio label {
+        font-size: 0.85rem !important;
+    }
+    
+    /* Input fields */
+    input {
+        font-size: 0.9rem !important;
+        color: #2d3748 !important;
+    }
+    
+    /* Selectbox */
+    .stSelectbox label, .stSelectbox div {
+        font-size: 0.85rem !important;
+        color: #2d3748 !important;
     }
     
     /* Success/error badges for covenants */
     .stAlert {
-        padding: 0.5rem !important;
-        margin-bottom: 0.3rem !important;
+        padding: 0.4rem !important;
+        margin-bottom: 0.25rem !important;
+        font-size: 0.85rem !important;
     }
     
     /* Compact spacing */
     .element-container {
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.4rem !important;
+    }
+    
+    /* Markdown text */
+    .stMarkdown {
+        color: #2d3748 !important;
+        font-size: 0.9rem !important;
     }
     
     /* Footer compact */
     footer {
         margin-top: 1rem !important;
+        color: #718096 !important;
+    }
+    
+    /* Info boxes */
+    .stInfo {
+        background-color: #e6f2ef !important;
+        color: #2d3748 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -318,8 +362,8 @@ tab1, tab2 = st.tabs(["Kaart-weergave", "Manifest-weergave"])
 
 # TAB 1: KAART-WEERGAVE
 with tab1:
-    # Two columns but with better proportions to fit everything
-    col1, col2 = st.columns([2.5, 1])
+    # Two columns - narrower map column for portrait orientation
+    col1, col2 = st.columns([2, 1.5])
     
     with col1:
         st.subheader("Kaart van Nederland")
@@ -340,13 +384,11 @@ with tab1:
         # Search box
         search_query = st.text_input("🔍 Zoeken", placeholder="Zoek gemeente, provincie...", label_visibility="collapsed")
         
-        # Create map - portrait orientation (taller than wide)
+        # Create map - portrait orientation (taller, narrower)
         m = folium.Map(
             location=[52.2, 5.3],  # Centered on NL
             zoom_start=7,
-            tiles="OpenStreetMap",
-            width="100%",
-            height=550  # Taller map
+            tiles="OpenStreetMap"
         )
         
         # Track which feature was clicked
@@ -427,8 +469,8 @@ with tab1:
                     icon=folium.Icon(color='red', icon='building', prefix='fa')
                 ).add_to(m)
         
-        # Display map
-        map_data = st_folium(m, width=None, height=550, returned_objects=["last_object_clicked"])
+        # Display map - portrait dimensions (narrower, taller)
+        map_data = st_folium(m, width=600, height=700, returned_objects=["last_object_clicked"])
         
         # Handle map clicks
         if map_data and map_data.get('last_object_clicked'):
@@ -515,13 +557,11 @@ with tab2:
                     if all(cov in signed_covenants for cov in selected_covenants):
                         matching_govs.add(gov)
             
-            # Create map with ALL government layers highlighted
+            # Create map with ALL government layers highlighted - portrait
             m2 = folium.Map(
                 location=[52.2, 5.3],
                 zoom_start=7,
-                tiles="OpenStreetMap",
-                width="100%",
-                height=550
+                tiles="OpenStreetMap"
             )
             
             # Add gemeenten with highlighting
@@ -582,8 +622,8 @@ with tab2:
                     )
                 ).add_to(m2)
             
-            # Display map
-            st_folium(m2, width=None, height=550)
+            # Display map - portrait dimensions
+            st_folium(m2, width=700, height=700)
             
             # Show list of matching governments
             if matching_govs:
