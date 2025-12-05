@@ -31,16 +31,24 @@ st.markdown("""
     
     /* VERY compact spacing */
     .main > div {
-        padding-top: 0.3rem !important;
-        padding-bottom: 0.3rem !important;
+        padding-top: 0.2rem !important;
+        padding-bottom: 0.2rem !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
     }
     
     .element-container {
-        margin-bottom: 0.2rem !important;
+        margin-bottom: 0.1rem !important;
+        padding: 0 !important;
     }
     
     .row-widget {
-        margin-bottom: 0.2rem !important;
+        margin-bottom: 0.1rem !important;
+        padding: 0.1rem !important;
+    }
+    
+    .stBlock {
+        padding: 0.1rem !important;
     }
     
     /* Small text everywhere */
@@ -50,13 +58,13 @@ st.markdown("""
         line-height: 1.3 !important;
     }
     
-    /* Title smaller */
+    /* Title smaller and compact */
     h1 {
         color: #173C2E !important;
         font-weight: 700;
-        font-size: 1.5rem !important;
-        margin-bottom: 0.5rem !important;
-        padding: 0.8rem;
+        font-size: 1.3rem !important;
+        margin-bottom: 0.3rem !important;
+        padding: 0.5rem 0.8rem;
         background-color: #E8E8E8;
         border-left: 4px solid #358A6A;
         border-radius: 4px;
@@ -65,9 +73,9 @@ st.markdown("""
     h2 {
         color: #173C2E !important;
         font-weight: 600;
-        font-size: 0.95rem !important;
-        margin-bottom: 0.3rem !important;
-        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem !important;
+        margin-bottom: 0.2rem !important;
+        padding: 0.3rem 0.5rem;
         background-color: #C9DBD4;
         border-radius: 3px;
     }
@@ -75,26 +83,26 @@ st.markdown("""
     h3 {
         color: #173C2E !important;
         font-weight: 600;
-        font-size: 0.85rem !important;
-        margin-bottom: 0.25rem !important;
+        font-size: 0.8rem !important;
+        margin-bottom: 0.2rem !important;
     }
     
-    /* Tab styling - clear with colors */
+    /* Tab styling - compact with clear colors */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 4px;
+        gap: 3px;
         background-color: #E8E8E8;
-        padding: 6px;
+        padding: 4px;
         border-radius: 6px;
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.3rem !important;
     }
     
     .stTabs [data-baseweb="tab"] {
-        height: 36px;
-        padding: 0 16px;
+        height: 32px;
+        padding: 0 14px;
         background-color: white;
         border-radius: 4px;
         font-weight: 600;
-        font-size: 0.8rem !important;
+        font-size: 0.75rem !important;
         color: #4a5568 !important;
         border: 1px solid #D1D1D1;
     }
@@ -111,22 +119,24 @@ st.markdown("""
         border-color: #358A6A !important;
     }
     
-    /* Expander - very compact with visual separation */
+    /* Expander - extremely compact with visual separation */
     .streamlit-expanderHeader {
         font-weight: 600;
         color: #173C2E !important;
-        font-size: 0.8rem !important;
-        padding: 0.4rem !important;
+        font-size: 0.75rem !important;
+        padding: 0.3rem !important;
         background-color: #C9DBD4;
         border-radius: 4px;
         border: 1px solid #D1D1D1;
+        margin-bottom: 0.1rem !important;
     }
     
     .streamlit-expanderContent {
-        padding: 0.4rem !important;
+        padding: 0.3rem !important;
         background-color: #fafafa;
         border: 1px solid #E8E8E8;
         border-radius: 0 0 4px 4px;
+        margin-bottom: 0.2rem !important;
     }
     
     /* Checkboxes - very compact */
@@ -152,17 +162,22 @@ st.markdown("""
         font-size: 0.75rem !important;
     }
     
-    /* Input fields */
+    /* Input fields - LIGHT backgrounds */
     input {
         font-size: 0.75rem !important;
         color: #2d3748 !important;
         padding: 0.3rem !important;
         border: 1px solid #D1D1D1 !important;
+        background-color: white !important;
     }
     
-    /* Selectbox */
+    input::placeholder {
+        color: #718096 !important;
+    }
+    
+    /* Selectbox - LIGHT background */
     .stSelectbox {
-        background-color: #fafafa;
+        background-color: white !important;
         padding: 0.3rem;
         border-radius: 4px;
         border: 1px solid #D1D1D1;
@@ -176,14 +191,34 @@ st.markdown("""
     
     .stSelectbox div {
         font-size: 0.75rem !important;
+        color: #2d3748 !important;
+        background-color: white !important;
     }
     
-    /* Alert boxes - VERY compact */
+    /* Force select element to be light */
+    select {
+        background-color: white !important;
+        color: #2d3748 !important;
+        border: 1px solid #D1D1D1 !important;
+    }
+    
+    /* Fix dropdown menu */
+    [data-baseweb="select"] {
+        background-color: white !important;
+    }
+    
+    [data-baseweb="select"] > div {
+        background-color: white !important;
+        color: #2d3748 !important;
+    }
+    
+    /* Alert boxes - EXTREMELY compact */
     .stAlert {
-        padding: 0.25rem 0.4rem !important;
-        margin-bottom: 0.15rem !important;
+        padding: 0.15rem 0.3rem !important;
+        margin-bottom: 0.1rem !important;
         font-size: 0.7rem !important;
         border-radius: 3px;
+        line-height: 1.2 !important;
     }
     
     .stSuccess {
@@ -212,16 +247,16 @@ st.markdown("""
         margin-bottom: 0.2rem !important;
     }
     
-    /* Columns with visual separation */
+    /* Columns with visual separation - more compact */
     [data-testid="column"] {
-        padding: 0.5rem !important;
+        padding: 0.3rem !important;
         border-radius: 4px;
     }
     
     [data-testid="column"]:first-child {
         background-color: #fafafa;
         border: 1px solid #E8E8E8;
-        margin-right: 0.5rem;
+        margin-right: 0.3rem;
     }
     
     [data-testid="column"]:last-child {
@@ -549,8 +584,8 @@ with tab1:
                     icon=folium.Icon(color='red', icon='building', prefix='fa')
                 ).add_to(m)
         
-        # Display map - portrait, compact to avoid black areas
-        map_data = st_folium(m, width=500, height=650, returned_objects=["last_object_clicked"])
+        # Display map - smaller to avoid black areas
+        map_data = st_folium(m, width=450, height=600, returned_objects=["last_object_clicked"])
         
         # Handle map clicks
         if map_data and map_data.get('last_object_clicked'):
