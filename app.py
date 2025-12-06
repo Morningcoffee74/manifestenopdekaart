@@ -650,7 +650,7 @@ with tab2:
                 GeoJson(
                     feature,
                     style_function=lambda x, highlighted=is_highlighted: {
-                        'fillColor': COLOR_GREEN if highlighted else '#dddddd', /* Groen bij highlight */
+                        'fillColor': COLOR_GREEN if highlighted else '#dddddd', 
                         'color': COLOR_DARK_GREEN if highlighted else '#999999',
                         'weight': 3 if highlighted else 1,
                         'fillOpacity': 0.6 if highlighted else 0.2
@@ -669,7 +669,7 @@ with tab2:
                 GeoJson(
                     feature,
                     style_function=lambda x, highlighted=is_highlighted: {
-                        'fillColor': COLOR_GREEN if highlighted else '#eeeeee', /* Groen bij highlight */
+                        'fillColor': COLOR_GREEN if highlighted else '#eeeeee',
                         'color': COLOR_DARK_GREEN if highlighted else '#aaaaaa',
                         'weight': 4 if highlighted else 2,
                         'fillOpacity': 0.5 if highlighted else 0.15
@@ -688,7 +688,7 @@ with tab2:
                 GeoJson(
                     feature,
                     style_function=lambda x, highlighted=is_highlighted: {
-                        'fillColor': COLOR_GREEN if highlighted else '#f0f0f0', /* Groen bij highlight */
+                        'fillColor': COLOR_GREEN if highlighted else '#f0f0f0',
                         'color': COLOR_DARK_GREEN if highlighted else '#bbbbbb',
                         'weight': 3 if highlighted else 1,
                         'fillOpacity': 0.5 if highlighted else 0.15,
