@@ -6,274 +6,238 @@ import json
 from folium import GeoJson, Marker, Icon
 import branca.colormap as cm
 
+# 1. Kleurdefinities (Voor gemakkelijker onderhoud)
+COLOR_LIGHT_GREEN = "#C9DBD4"
+COLOR_LIGHT_GREY = "#E8E8E8"
+COLOR_GREY = "#D1D1D1"
+COLOR_DARK_GREEN = "#173C2E"
+COLOR_GREEN = "#358A6A"
+COLOR_WHITE = "#ffffff"
+COLOR_TEXT_DARK = "#2d3748"
+COLOR_TEXT_MUTED = "#718096"
+
+
 # Page config
 st.set_page_config(page_title="Manifesten op de Kaart", layout="wide", initial_sidebar_state="expanded")
 
-# Custom CSS - Compact design with clear visual separation
-st.markdown("""
+# 2. Custom CSS - Verbeterd uiterlijk met meer ademruimte en logische kleuren
+
+st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
     
-    * {
+    * {{
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
+    }}
     
-    /* White background */
-    .main {
-        background-color: #ffffff;
-        color: #2d3748;
-        padding: 0.5rem !important;
-    }
+    /* Global Background and Spacing - Minder compact, meer ademruimte */
+    .main, .stApp {{
+        background-color: {COLOR_WHITE};
+        color: {COLOR_TEXT_DARK};
+    }}
     
-    .stApp {
-        background-color: #ffffff;
-    }
+    .main > div {{
+        padding-top: 1rem !important; /* Meer ruimte bovenaan */
+        padding-bottom: 1rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }}
     
-    /* VERY compact spacing */
-    .main > div {
-        padding-top: 0.2rem !important;
-        padding-bottom: 0.2rem !important;
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
-    }
-    
-    .element-container {
-        margin-bottom: 0.1rem !important;
+    .element-container {{
+        margin-bottom: 0.5rem !important; /* Meer ruimte tussen elementen */
         padding: 0 !important;
-    }
+    }}
     
-    .row-widget {
-        margin-bottom: 0.1rem !important;
-        padding: 0.1rem !important;
-    }
+    .row-widget, .stBlock {{
+        margin-bottom: 0.5rem !important;
+        padding: 0.5rem !important;
+    }}
     
-    .stBlock {
-        padding: 0.1rem !important;
-    }
+    /* Tekstgrootte - Behoud leesbaarheid */
+    p, span, div, label {{
+        color: {COLOR_TEXT_DARK} !important;
+        font-size: 0.9rem !important; /* Iets grotere, leesbare tekst */
+        line-height: 1.5 !important;
+    }}
     
-    /* Small text everywhere */
-    p, span, div, label {
-        color: #2d3748 !important;
-        font-size: 0.8rem !important;
-        line-height: 1.3 !important;
-    }
-    
-    /* Title smaller and compact */
-    h1 {
-        color: #173C2E !important;
+    /* H1 Title - Schoner en helderder */
+    h1 {{
+        color: {COLOR_DARK_GREEN} !important;
         font-weight: 700;
-        font-size: 1.3rem !important;
-        margin-bottom: 0.3rem !important;
-        padding: 0.5rem 0.8rem;
-        background-color: #E8E8E8;
-        border-left: 4px solid #358A6A;
+        font-size: 1.8rem !important; 
+        margin-bottom: 1rem !important;
+        padding: 0.8rem 1rem;
+        background-color: {COLOR_LIGHT_GREY};
+        border-left: 5px solid {COLOR_GREEN};
         border-radius: 4px;
-    }
+    }}
     
-    h2 {
-        color: #173C2E !important;
+    /* H2 Subheader - Subtiele scheiding */
+    h2 {{
+        color: {COLOR_DARK_GREEN} !important;
+        font-weight: 600;
+        font-size: 1.1rem !important;
+        margin-bottom: 0.5rem !important;
+        padding: 0.5rem 0.8rem;
+        background-color: {COLOR_LIGHT_GREEN};
+        border-radius: 3px;
+    }}
+    
+    h3 {{
+        color: {COLOR_DARK_GREEN} !important;
+        font-weight: 600;
+        font-size: 1rem !important;
+        margin-bottom: 0.5rem !important;
+    }}
+
+    /* Tabs - Duidelijker contrast */
+    .stTabs [data-baseweb="tab-list"] {{
+        gap: 5px;
+        background-color: {COLOR_LIGHT_GREY};
+        padding: 6px;
+        border-radius: 8px;
+        margin-bottom: 1rem !important;
+    }}
+    
+    .stTabs [data-baseweb="tab"] {{
+        height: 36px;
+        padding: 0 18px;
+        background-color: {COLOR_WHITE};
+        border-radius: 5px;
         font-weight: 600;
         font-size: 0.85rem !important;
-        margin-bottom: 0.2rem !important;
-        padding: 0.3rem 0.5rem;
-        background-color: #C9DBD4;
-        border-radius: 3px;
-    }
+        color: {COLOR_TEXT_DARK} !important;
+        border: 1px solid {COLOR_GREY};
+        transition: all 0.2s ease;
+    }}
     
-    h3 {
-        color: #173C2E !important;
+    .stTabs [data-baseweb="tab"]:hover {{
+        background-color: {COLOR_LIGHT_GREEN};
+        color: {COLOR_DARK_GREEN} !important;
+        border-color: {COLOR_GREEN};
+    }}
+    
+    .stTabs [aria-selected="true"] {{
+        background-color: {COLOR_GREEN} !important; /* Primaire kleur voor actieve tab */
+        color: {COLOR_WHITE} !important;
+        border-color: {COLOR_GREEN} !important;
+    }}
+    
+    /* Expander - Rustiger en meer ademruimte */
+    .streamlit-expanderHeader {{
         font-weight: 600;
-        font-size: 0.8rem !important;
-        margin-bottom: 0.2rem !important;
-    }
-    
-    /* Tab styling - compact with clear colors */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 3px;
-        background-color: #E8E8E8;
-        padding: 4px;
-        border-radius: 6px;
+        color: {COLOR_DARK_GREEN} !important;
+        font-size: 0.85rem !important;
+        padding: 0.5rem !important;
+        background-color: {COLOR_LIGHT_GREEN};
+        border-radius: 4px;
+        border: none; /* Rand verwijderd */
         margin-bottom: 0.3rem !important;
-    }
+    }}
     
-    .stTabs [data-baseweb="tab"] {
-        height: 32px;
-        padding: 0 14px;
-        background-color: white;
-        border-radius: 4px;
-        font-weight: 600;
-        font-size: 0.75rem !important;
-        color: #4a5568 !important;
-        border: 1px solid #D1D1D1;
-    }
-    
-    .stTabs [data-baseweb="tab"]:hover {
-        background-color: #C9DBD4;
-        color: #173C2E !important;
-        border-color: #358A6A;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background-color: #358A6A !important;
-        color: white !important;
-        border-color: #358A6A !important;
-    }
-    
-    /* Expander - extremely compact with visual separation */
-    .streamlit-expanderHeader {
-        font-weight: 600;
-        color: #173C2E !important;
-        font-size: 0.75rem !important;
-        padding: 0.3rem !important;
-        background-color: #C9DBD4;
-        border-radius: 4px;
-        border: 1px solid #D1D1D1;
-        margin-bottom: 0.1rem !important;
-    }
-    
-    .streamlit-expanderContent {
-        padding: 0.3rem !important;
-        background-color: #fafafa;
-        border: 1px solid #E8E8E8;
+    .streamlit-expanderContent {{
+        padding: 0.8rem !important;
+        background-color: {COLOR_WHITE};
+        border: 1px solid {COLOR_GREY};
         border-radius: 0 0 4px 4px;
-        margin-bottom: 0.2rem !important;
-    }
+        margin-bottom: 0.5rem !important;
+    }}
     
-    /* Checkboxes - very compact */
-    .stCheckbox {
-        margin-bottom: 0.15rem !important;
-        padding: 0.1rem !important;
-    }
+    /* Checkboxes - Meer ruimte */
+    .stCheckbox {{
+        margin-bottom: 0.3rem !important;
+        padding: 0.2rem !important;
+    }}
     
-    .stCheckbox label {
-        font-size: 0.75rem !important;
-        padding-left: 0.3rem !important;
-    }
+    .stCheckbox label {{
+        font-size: 0.85rem !important;
+        padding-left: 0.5rem !important;
+    }}
     
-    /* Radio buttons */
-    .stRadio {
-        padding: 0.3rem !important;
-        background-color: #C9DBD4;
+    /* Radio buttons - Duidelijker */
+    .stRadio {{
+        padding: 0.5rem !important;
+        background-color: {COLOR_LIGHT_GREY};
         border-radius: 4px;
-        border: 1px solid #D1D1D1;
-    }
+        border: 1px solid {COLOR_GREY};
+    }}
     
-    .stRadio label {
-        font-size: 0.75rem !important;
-    }
+    .stRadio label {{
+        font-size: 0.85rem !important;
+    }}
     
-    /* Input fields - LIGHT backgrounds */
-    input {
-        font-size: 0.75rem !important;
-        color: #2d3748 !important;
-        padding: 0.3rem !important;
-        border: 1px solid #D1D1D1 !important;
-        background-color: white !important;
-    }
-    
-    input::placeholder {
-        color: #718096 !important;
-    }
-    
-    /* Selectbox - LIGHT background */
-    .stSelectbox {
-        background-color: white !important;
-        padding: 0.3rem;
+    /* Input fields and Selectbox - Meer standaard look & feel */
+    input, [data-baseweb="select"] > div, select {{
+        font-size: 0.85rem !important;
+        color: {COLOR_TEXT_DARK} !important;
+        padding: 0.5rem !important;
+        border: 1px solid {COLOR_GREY} !important;
+        background-color: {COLOR_WHITE} !important;
         border-radius: 4px;
-        border: 1px solid #D1D1D1;
-    }
+    }}
     
-    .stSelectbox label {
-        font-size: 0.75rem !important;
+    .stSelectbox label {{
+        font-size: 0.85rem !important;
         font-weight: 600;
-        color: #173C2E !important;
-    }
-    
-    .stSelectbox div {
-        font-size: 0.75rem !important;
-        color: #2d3748 !important;
-        background-color: white !important;
-    }
-    
-    /* Force select element to be light */
-    select {
-        background-color: white !important;
-        color: #2d3748 !important;
-        border: 1px solid #D1D1D1 !important;
-    }
-    
-    /* Fix dropdown menu */
-    [data-baseweb="select"] {
-        background-color: white !important;
-    }
-    
-    [data-baseweb="select"] > div {
-        background-color: white !important;
-        color: #2d3748 !important;
-    }
-    
-    /* Alert boxes - EXTREMELY compact */
-    .stAlert {
-        padding: 0.15rem 0.3rem !important;
-        margin-bottom: 0.1rem !important;
-        font-size: 0.7rem !important;
-        border-radius: 3px;
-        line-height: 1.2 !important;
-    }
-    
-    .stSuccess {
-        background-color: #C9DBD4 !important;
-        border-left: 3px solid #358A6A !important;
-    }
-    
-    .stError {
-        background-color: #DAC6CD !important;
-        border-left: 3px solid #173C2E !important;
-    }
-    
-    .stInfo {
-        background-color: #E8E8E8 !important;
-        border-left: 3px solid #173C2E !important;
-    }
-    
-    .stWarning {
-        background-color: #DAC6CD !important;
-    }
-    
-    /* Markdown - compact */
-    .stMarkdown {
-        color: #2d3748 !important;
-        font-size: 0.75rem !important;
+        color: {COLOR_DARK_GREEN} !important;
         margin-bottom: 0.2rem !important;
-    }
+    }}
     
-    /* Columns with visual separation - more compact */
-    [data-testid="column"] {
-        padding: 0.3rem !important;
+    /* Alert boxes - Logischer kleurgebruik */
+    .stAlert {{
+        padding: 0.3rem 0.6rem !important;
+        margin-bottom: 0.5rem !important;
+        font-size: 0.8rem !important;
         border-radius: 4px;
-    }
+        line-height: 1.4 !important;
+    }}
     
-    [data-testid="column"]:first-child {
-        background-color: #fafafa;
-        border: 1px solid #E8E8E8;
-        margin-right: 0.3rem;
-    }
+    /* Success: Groen (Goede Match) */
+    .stSuccess {{
+        background-color: {COLOR_LIGHT_GREEN} !important;
+        border-left: 4px solid {COLOR_GREEN} !important;
+        color: {COLOR_DARK_GREEN} !important;
+    }}
     
-    [data-testid="column"]:last-child {
-        background-color: #fafafa;
-        border: 1px solid #E8E8E8;
-    }
+    /* Error: Donkerder/Grijs (Geen Match) */
+    .stError {{
+        background-color: {COLOR_LIGHT_GREY} !important;
+        border-left: 4px solid {COLOR_GREY} !important;
+        color: {COLOR_TEXT_DARK} !important;
+    }}
+    
+    /* Info/Warning: Neutraal */
+    .stInfo, .stWarning {{
+        background-color: {COLOR_LIGHT_GREY} !important;
+        border-left: 4px solid {COLOR_GREY} !important;
+        color: {COLOR_TEXT_DARK} !important;
+    }}
+    
+    /* Columns - Visuele scheiding verzacht */
+    [data-testid="column"] {{
+        padding: 0.5rem !important;
+        border-radius: 4px;
+    }}
+    
+    [data-testid="column"]:first-child, [data-testid="column"]:last-child {{
+        background-color: {COLOR_WHITE}; /* Achtergrond verwijderd voor meer "lucht" */
+        border: none; 
+        margin-right: 0;
+        margin-left: 0;
+    }}
     
     /* Footer */
-    footer {
-        margin-top: 0.5rem !important;
-        font-size: 0.7rem !important;
-        color: #718096 !important;
-    }
+    footer {{
+        margin-top: 1rem !important;
+        font-size: 0.8rem !important;
+        color: {COLOR_TEXT_MUTED} !important;
+        padding-top: 0.5rem;
+        border-top: 1px solid {COLOR_LIGHT_GREY};
+    }}
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state
+# Initialize session state (onveranderd)
 if 'selected_government' not in st.session_state:
     st.session_state.selected_government = None
 if 'selected_covenants' not in st.session_state:
@@ -284,7 +248,8 @@ if 'covenant_filter_mode' not in st.session_state:
 # Title - no emoji
 st.title("Manifesten op de Kaart")
 
-# Load dummy data
+# 3. Load dummy data (onveranderd)
+
 @st.cache_data
 def load_covenant_data():
     """Load covenant and government linkage data"""
@@ -299,9 +264,8 @@ def load_covenant_data():
         "Nationaal Programma Circulaire Economie (NPCE)",
         "VNG-Programma Klimaatadaptatie"
     ]
-    
+
     # Dummy data: which governments signed which covenants
-    # In reality this would come from CSV/database
     government_covenants = {
         "Amsterdam": ["MVOI ondertekend", "SDG-gemeenten", "SLA"],
         "Rotterdam": ["MVOI ondertekend", "Green Deal Biobased Bouwen", "NPCE"],
@@ -314,13 +278,13 @@ def load_covenant_data():
         "Waterschap Amstel, Gooi en Vecht": ["SLA", "VNG-Programma Klimaatadaptatie"],
         "Waterschap Hollandse Delta": ["Green Deal Biobased Bouwen"],
     }
-    
+
     return covenants, government_covenants
 
 @st.cache_data
 def load_geo_data():
     """Load geographical boundaries data - using simplified dummy data for demo"""
-    
+
     # Simplified gemeente data (just a few for demo)
     gemeenten = {
         "type": "FeatureCollection",
@@ -387,7 +351,7 @@ def load_geo_data():
             }
         ]
     }
-    
+
     # Simplified provincie data
     provincies = {
         "type": "FeatureCollection",
@@ -414,7 +378,7 @@ def load_geo_data():
             }
         ]
     }
-    
+
     # Simplified waterschap data
     waterschappen = {
         "type": "FeatureCollection",
@@ -441,7 +405,7 @@ def load_geo_data():
             }
         ]
     }
-    
+
     return gemeenten, provincies, waterschappen
 
 @st.cache_data
@@ -454,7 +418,7 @@ def load_semi_governments():
         {"name": "Min. van Binnenlandse Zaken", "lat": 52.2, "lon": 3.9, "type": "ministerie"},
         {"name": "Min. van Volkshuisvesting", "lat": 52.15, "lon": 3.85, "type": "ministerie"},
     ]
-    
+
     # Semi-overheden - actual headquarter locations
     semi_overheden = [
         {"name": "TenneT", "lat": 51.9851, "lon": 5.8987, "type": "semi-overheid"},  # Arnhem
@@ -464,7 +428,7 @@ def load_semi_governments():
         {"name": "Havenbedrijf Rotterdam", "lat": 51.9225, "lon": 4.4792, "type": "semi-overheid"},  # Rotterdam
         {"name": "Port of Amsterdam", "lat": 52.4089, "lon": 4.8565, "type": "semi-overheid"},  # Amsterdam
     ]
-    
+
     return ministeries, semi_overheden
 
 # Load all data
@@ -473,17 +437,18 @@ gemeenten_data, provincies_data, waterschappen_data = load_geo_data()
 ministeries, semi_overheden = load_semi_governments()
 
 # Create tabs - no emojis
-tab1, tab2 = st.tabs(["Kaart-weergave", "Manifest-weergave"])
+tab1, tab2 = st.tabs(["🗺️ Kaart-weergave", "📄 Manifest-weergave"])
 
-# TAB 1: KAART-WEERGAVE
+# 4. TAB 1: KAART-WEERGAVE
+
 with tab1:
-    # Two columns - narrower map column for portrait orientation
-    col1, col2 = st.columns([2, 1.5])
-    
+    # Kolomverhouding aangepast voor een bredere kaart
+    col1, col2 = st.columns([2.5, 1.5]) 
+
     with col1:
         st.subheader("Kaart van Nederland")
         
-        # Filters - more compact
+        # Filters - meer ademruimte
         with st.expander("Kaartlagen", expanded=True):
             fcol1, fcol2, fcol3, fcol4 = st.columns(4)
             with fcol1:
@@ -496,18 +461,16 @@ with tab1:
                 show_ministeries = st.checkbox("Ministeries", value=True)
                 show_semi = st.checkbox("Semi-overheden", value=True)
         
+        
         # Search box
         search_query = st.text_input("🔍 Zoeken", placeholder="Zoek gemeente, provincie...", label_visibility="collapsed")
         
-        # Create map - portrait orientation (taller, narrower)
+        # Create map
         m = folium.Map(
             location=[52.2, 5.3],  # Centered on NL
             zoom_start=7,
             tiles="OpenStreetMap"
         )
-        
-        # Track which feature was clicked
-        clicked_feature = None
         
         # Add layers based on filters
         if show_gemeenten:
@@ -521,8 +484,8 @@ with tab1:
                     feature,
                     name=gov_name,
                     style_function=lambda x, matched=is_search_match: {
-                        'fillColor': '#FFD700' if matched else '#3388ff',
-                        'color': '#FFA500' if matched else '#2c5aa0',
+                        'fillColor': COLOR_GREEN if matched else '#3388ff', # Groen bij match, standaard blauw
+                        'color': COLOR_DARK_GREEN if matched else '#2c5aa0',
                         'weight': 4 if matched else 2,
                         'fillOpacity': 0.7 if matched else 0.3
                     },
@@ -584,16 +547,15 @@ with tab1:
                     icon=folium.Icon(color='red', icon='building', prefix='fa')
                 ).add_to(m)
         
-        # Display map - smaller to avoid black areas
-        map_data = st_folium(m, width=450, height=600, returned_objects=["last_object_clicked"])
+        
+        # Display map - breder gemaakt voor betere oriëntatie
+        map_data = st_folium(m, width=700, height=600, returned_objects=["last_object_clicked"])
         
         # Handle map clicks
         if map_data and map_data.get('last_object_clicked'):
             clicked = map_data['last_object_clicked']
-            # Try to find which feature was clicked by proximity
-            # This is a simplified approach - in production you'd use proper geo queries
             st.info(f"Klik gedetecteerd op: {clicked}")
-    
+
     with col2:
         st.subheader("Details")
         
@@ -613,25 +575,29 @@ with tab1:
             if selected in government_covenants:
                 signed = government_covenants[selected]
                 
-                # Very compact display
+                # Verbeterde display met logischer kleuren
                 for covenant in covenants_list:
                     if covenant in signed:
-                        st.success(f"✓ {covenant}", icon="✅")
+                        # Succes: Groen
+                        st.success(f"✅ {covenant}", icon=" ")
                     else:
-                        st.error(f"✗ {covenant}", icon="❌")
+                        # Geen match: Neutraal/Error
+                        st.error(f"❌ {covenant}", icon=" ")
             else:
                 st.info("Geen manifesten gevonden")
         else:
             st.info("👈 Selecteer een overheid om details te zien")
 
-# TAB 2: MANIFEST-WEERGAVE
+# 5. TAB 2: MANIFEST-WEERGAVE
+
 with tab2:
-    col1, col2 = st.columns([1, 2.5])
-    
+    # Kolomverhouding aangepast voor een bredere kaart
+    col1, col2 = st.columns([1, 3])
+
     with col1:
         st.subheader("Manifesten")
         
-        # EN/OF filter mode - more compact
+        # EN/OF filter mode - meer ademruimte
         filter_mode = st.radio(
             "Filter:",
             options=["OF", "EN"],
@@ -647,10 +613,10 @@ with tab2:
                 selected_covenants.append(covenant)
         
         if selected_covenants:
-            st.success(f"{len(selected_covenants)} geselecteerd")
+            st.success(f"**{len(selected_covenants)}** manifest(en) geselecteerd")
         else:
             st.info("Geen selectie")
-    
+
     with col2:
         st.subheader("Aangesloten overheden")
         
@@ -669,14 +635,14 @@ with tab2:
                     if all(cov in signed_covenants for cov in selected_covenants):
                         matching_govs.add(gov)
             
-            # Create map with ALL government layers highlighted - portrait
+            # Create map with ALL government layers highlighted - breder
             m2 = folium.Map(
                 location=[52.2, 5.3],
                 zoom_start=7,
                 tiles="OpenStreetMap"
             )
             
-            # Add gemeenten with highlighting
+            # Add gemeenten with highlighting (Kleurlogica aangepast)
             for feature in gemeenten_data['features']:
                 gov_name = feature['properties']['name']
                 is_highlighted = gov_name in matching_govs
@@ -684,8 +650,8 @@ with tab2:
                 GeoJson(
                     feature,
                     style_function=lambda x, highlighted=is_highlighted: {
-                        'fillColor': '#ff4444' if highlighted else '#dddddd',
-                        'color': '#cc0000' if highlighted else '#999999',
+                        'fillColor': COLOR_GREEN if highlighted else '#dddddd', /* Groen bij highlight */
+                        'color': COLOR_DARK_GREEN if highlighted else '#999999',
                         'weight': 3 if highlighted else 1,
                         'fillOpacity': 0.6 if highlighted else 0.2
                     },
@@ -695,7 +661,7 @@ with tab2:
                     )
                 ).add_to(m2)
             
-            # Add provincies with highlighting
+            # Add provincies with highlighting (Kleurlogica aangepast)
             for feature in provincies_data['features']:
                 gov_name = feature['properties']['name']
                 is_highlighted = gov_name in matching_govs
@@ -703,8 +669,8 @@ with tab2:
                 GeoJson(
                     feature,
                     style_function=lambda x, highlighted=is_highlighted: {
-                        'fillColor': '#ff7800' if highlighted else '#eeeeee',
-                        'color': '#cc6000' if highlighted else '#aaaaaa',
+                        'fillColor': COLOR_GREEN if highlighted else '#eeeeee', /* Groen bij highlight */
+                        'color': COLOR_DARK_GREEN if highlighted else '#aaaaaa',
                         'weight': 4 if highlighted else 2,
                         'fillOpacity': 0.5 if highlighted else 0.15
                     },
@@ -714,7 +680,7 @@ with tab2:
                     )
                 ).add_to(m2)
             
-            # Add waterschappen with highlighting
+            # Add waterschappen with highlighting (Kleurlogica aangepast)
             for feature in waterschappen_data['features']:
                 gov_name = feature['properties']['name']
                 is_highlighted = gov_name in matching_govs
@@ -722,8 +688,8 @@ with tab2:
                 GeoJson(
                     feature,
                     style_function=lambda x, highlighted=is_highlighted: {
-                        'fillColor': '#00bfff' if highlighted else '#f0f0f0',
-                        'color': '#0099cc' if highlighted else '#bbbbbb',
+                        'fillColor': COLOR_GREEN if highlighted else '#f0f0f0', /* Groen bij highlight */
+                        'color': COLOR_DARK_GREEN if highlighted else '#bbbbbb',
                         'weight': 3 if highlighted else 1,
                         'fillOpacity': 0.5 if highlighted else 0.15,
                         'dashArray': '5, 5'
@@ -734,8 +700,8 @@ with tab2:
                     )
                 ).add_to(m2)
             
-            # Display map - compact portrait
-            st_folium(m2, width=650, height=650)
+            # Display map - breder
+            st_folium(m2, width=800, height=650)
             
             # Show list of matching governments
             if matching_govs:
@@ -749,5 +715,5 @@ with tab2:
         else:
             st.info("👈 Selecteer een of meerdere manifesten om aangesloten overheden te zien")
 
-# Footer - compact
+# Footer - compact (onveranderd)
 st.caption("Demo v0.4 | Manifesten op de Kaart")
