@@ -92,6 +92,10 @@ st.markdown(f"""
         padding: 0 10px;
     }}
     
+    .stTabs [aria-selected="true"] {{
+        background-color: {COLOR_GREEN} !important;
+    }}
+    
     /* Expander - Maximaal compact */
     .streamlit-expanderHeader {{
         font-size: 0.8rem !important;
@@ -480,7 +484,8 @@ with tab1:
         
         
         # Display map - breder gemaakt voor betere oriëntatie
-        st_folium(m, width=700, height=600, returned_objects=["last_object_clicked"])
+        # ** FIX VOOR NameError: map_data is nu gedefinieerd **
+        map_data = st_folium(m, width=700, height=600, returned_objects=["last_object_clicked"])
         
         # Handle map clicks
         if map_data and map_data.get('last_object_clicked'):
