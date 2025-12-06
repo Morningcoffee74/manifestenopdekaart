@@ -6,8 +6,9 @@ import json
 from folium import GeoJson, Marker, Icon
 import branca.colormap as cm
 
-# 1. Kleurdefinities (Voor gemakkelijker onderhoud)
+# 1. Kleurdefinities
 COLOR_LIGHT_GREEN = "#C9DBD4"
+COLOR_LIGHT_GREY_F0 = "#F0F0F0" # Nieuwe zeer lichte grijs
 COLOR_LIGHT_GREY = "#E8E8E8"
 COLOR_GREY = "#D1D1D1"
 COLOR_DARK_GREEN = "#173C2E"
@@ -20,7 +21,7 @@ COLOR_TEXT_MUTED = "#718096"
 # Page config
 st.set_page_config(page_title="Manifesten op de Kaart", layout="wide", initial_sidebar_state="expanded")
 
-# 2. Custom CSS - Verbeterd uiterlijk met meer ademruimte en logische kleuren
+# 2. Custom CSS - MAXIMALE COMPACTHEID, Selectbox Fix & Beter Kadreren
 
 st.markdown(f"""
 <style>
@@ -30,210 +31,129 @@ st.markdown(f"""
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }}
     
-    /* Global Background and Spacing - Minder compact, meer ademruimte */
-    .main, .stApp {{
-        background-color: {COLOR_WHITE};
-        color: {COLOR_TEXT_DARK};
-    }}
-    
+    /* Global Spacing - EXTREME COMPACTHEID */
     .main > div {{
-        padding-top: 1rem !important; /* Meer ruimte bovenaan */
-        padding-bottom: 1rem !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
+        padding-top: 0.1rem !important; 
+        padding-bottom: 0.1rem !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
     }}
     
-    .element-container {{
-        margin-bottom: 0.5rem !important; /* Meer ruimte tussen elementen */
-        padding: 0 !important;
+    .element-container, .row-widget, .stBlock {{
+        margin-bottom: 0.2rem !important;
+        padding: 0.1rem !important;
     }}
     
-    .row-widget, .stBlock {{
-        margin-bottom: 0.5rem !important;
-        padding: 0.5rem !important;
-    }}
-    
-    /* Tekstgrootte - Behoud leesbaarheid */
-    p, span, div, label {{
+    /* Tekstgrootte - Nog compacter voor meer informatie per scherm */
+    p, span, div, label, .stMarkdown {{
         color: {COLOR_TEXT_DARK} !important;
-        font-size: 0.9rem !important; /* Iets grotere, leesbare tekst */
-        line-height: 1.5 !important;
+        font-size: 0.8rem !important;
+        line-height: 1.4 !important;
     }}
     
-    /* H1 Title - Schoner en helderder */
+    /* H1 Title - Strak en gecentreerd */
     h1 {{
         color: {COLOR_DARK_GREEN} !important;
-        font-weight: 700;
-        font-size: 1.8rem !important; 
-        margin-bottom: 1rem !important;
-        padding: 0.8rem 1rem;
+        font-size: 1.5rem !important; 
+        margin-bottom: 0.5rem !important;
+        padding: 0.5rem 0.8rem;
         background-color: {COLOR_LIGHT_GREY};
         border-left: 5px solid {COLOR_GREEN};
         border-radius: 4px;
     }}
     
-    /* H2 Subheader - Subtiele scheiding */
+    /* H2 Subheader - Kleinere, duidelijke kaders */
     h2 {{
         color: {COLOR_DARK_GREEN} !important;
-        font-weight: 600;
-        font-size: 1.1rem !important;
-        margin-bottom: 0.5rem !important;
-        padding: 0.5rem 0.8rem;
+        font-size: 1rem !important;
+        margin-bottom: 0.3rem !important;
+        padding: 0.3rem 0.5rem;
         background-color: {COLOR_LIGHT_GREEN};
         border-radius: 3px;
     }}
     
-    h3 {{
-        color: {COLOR_DARK_GREEN} !important;
-        font-weight: 600;
-        font-size: 1rem !important;
-        margin-bottom: 0.5rem !important;
-    }}
-
-    /* Tabs - Duidelijker contrast */
+    /* Tabs - Zeer strak */
     .stTabs [data-baseweb="tab-list"] {{
-        gap: 5px;
-        background-color: {COLOR_LIGHT_GREY};
-        padding: 6px;
-        border-radius: 8px;
-        margin-bottom: 1rem !important;
+        gap: 3px;
+        background-color: {COLOR_LIGHT_GREY_F0};
+        padding: 4px;
+        border-radius: 6px;
+        margin-bottom: 0.5rem !important;
     }}
     
     .stTabs [data-baseweb="tab"] {{
-        height: 36px;
-        padding: 0 18px;
-        background-color: {COLOR_WHITE};
-        border-radius: 5px;
-        font-weight: 600;
-        font-size: 0.85rem !important;
-        color: {COLOR_TEXT_DARK} !important;
-        border: 1px solid {COLOR_GREY};
-        transition: all 0.2s ease;
-    }}
-    
-    .stTabs [data-baseweb="tab"]:hover {{
-        background-color: {COLOR_LIGHT_GREEN};
-        color: {COLOR_DARK_GREEN} !important;
-        border-color: {COLOR_GREEN};
+        height: 30px;
+        font-size: 0.8rem !important;
     }}
     
     .stTabs [aria-selected="true"] {{
-        background-color: {COLOR_GREEN} !important; /* Primaire kleur voor actieve tab */
-        color: {COLOR_WHITE} !important;
-        border-color: {COLOR_GREEN} !important;
+        background-color: {COLOR_GREEN} !important;
     }}
     
-    /* Expander - Rustiger en meer ademruimte */
+    /* Expander - Maximaal compact */
     .streamlit-expanderHeader {{
-        font-weight: 600;
-        color: {COLOR_DARK_GREEN} !important;
-        font-size: 0.85rem !important;
-        padding: 0.5rem !important;
+        font-size: 0.8rem !important;
+        padding: 0.4rem !important;
         background-color: {COLOR_LIGHT_GREEN};
         border-radius: 4px;
-        border: none; /* Rand verwijderd */
-        margin-bottom: 0.3rem !important;
+        margin-bottom: 0.1rem !important;
     }}
     
     .streamlit-expanderContent {{
-        padding: 0.8rem !important;
-        background-color: {COLOR_WHITE};
+        padding: 0.5rem !important;
         border: 1px solid {COLOR_GREY};
-        border-radius: 0 0 4px 4px;
-        margin-bottom: 0.5rem !important;
-    }}
-    
-    /* Checkboxes - Meer ruimte */
-    .stCheckbox {{
         margin-bottom: 0.3rem !important;
-        padding: 0.2rem !important;
     }}
     
-    .stCheckbox label {{
-        font-size: 0.85rem !important;
-        padding-left: 0.5rem !important;
-    }}
-    
-    /* Radio buttons - Duidelijker */
-    .stRadio {{
-        padding: 0.5rem !important;
-        background-color: {COLOR_LIGHT_GREY};
-        border-radius: 4px;
-        border: 1px solid {COLOR_GREY};
-    }}
-    
-    .stRadio label {{
-        font-size: 0.85rem !important;
-    }}
-    
-    /* Input fields and Selectbox - Meer standaard look & feel */
-    input, [data-baseweb="select"] > div, select {{
-        font-size: 0.85rem !important;
-        color: {COLOR_TEXT_DARK} !important;
-        padding: 0.5rem !important;
-        border: 1px solid {COLOR_GREY} !important;
-        background-color: {COLOR_WHITE} !important;
-        border-radius: 4px;
-    }}
-    
-    .stSelectbox label {{
-        font-size: 0.85rem !important;
-        font-weight: 600;
-        color: {COLOR_DARK_GREEN} !important;
-        margin-bottom: 0.2rem !important;
-    }}
-    
-    /* Alert boxes - Logischer kleurgebruik */
+    /* Alert boxes - Zeer compact */
     .stAlert {{
-        padding: 0.3rem 0.6rem !important;
-        margin-bottom: 0.5rem !important;
-        font-size: 0.8rem !important;
-        border-radius: 4px;
-        line-height: 1.4 !important;
+        padding: 0.2rem 0.5rem !important;
+        margin-bottom: 0.2rem !important;
+        font-size: 0.75rem !important;
     }}
     
-    /* Success: Groen (Goede Match) */
-    .stSuccess {{
-        background-color: {COLOR_LIGHT_GREEN} !important;
-        border-left: 4px solid {COLOR_GREEN} !important;
-        color: {COLOR_DARK_GREEN} !important;
-    }}
-    
-    /* Error: Donkerder/Grijs (Geen Match) */
-    .stError {{
-        background-color: {COLOR_LIGHT_GREY} !important;
-        border-left: 4px solid {COLOR_GREY} !important;
-        color: {COLOR_TEXT_DARK} !important;
-    }}
-    
-    /* Info/Warning: Neutraal */
-    .stInfo, .stWarning {{
-        background-color: {COLOR_LIGHT_GREY} !important;
-        border-left: 4px solid {COLOR_GREY} !important;
-        color: {COLOR_TEXT_DARK} !important;
-    }}
-    
-    /* Columns - Visuele scheiding verzacht */
+    /* KOLOM KADERS (BETER TONEN) */
     [data-testid="column"] {{
-        padding: 0.5rem !important;
+        padding: 0.3rem !important;
+    }}
+    
+    [data-testid="column"]:first-child {{
+        background-color: {COLOR_LIGHT_GREY_F0}; /* Lichte achtergrond */
+        border: 1px solid {COLOR_GREY}; /* Subtiele kader */
         border-radius: 4px;
     }}
     
-    [data-testid="column"]:first-child, [data-testid="column"]:last-child {{
-        background-color: {COLOR_WHITE}; /* Achtergrond verwijderd voor meer "lucht" */
-        border: none; 
-        margin-right: 0;
-        margin-left: 0;
+    [data-testid="column"]:last-child {{
+        background-color: {COLOR_WHITE}; 
+        border: 1px solid {COLOR_GREY}; /* Subtiele kader */
+        border-radius: 4px;
     }}
     
-    /* Footer */
-    footer {{
-        margin-top: 1rem !important;
-        font-size: 0.8rem !important;
-        color: {COLOR_TEXT_MUTED} !important;
-        padding-top: 0.5rem;
-        border-top: 1px solid {COLOR_LIGHT_GREY};
+    /* **SELECTBOX DROP-DOWN FIX** */
+    /* Dit zorgt ervoor dat de dropdown (pop-up) zelf licht is met donkere tekst */
+    [data-baseweb="menu"] {{
+        background-color: {COLOR_LIGHT_GREY_F0} !important; /* Lichte achtergrond voor de lijst */
+        border: 1px solid {COLOR_GREY};
+        border-radius: 4px;
     }}
+    
+    [data-baseweb="menu"] li, [data-baseweb="menu"] li span {{
+        color: {COLOR_TEXT_DARK} !important; /* Donkere tekst voor de items */
+        font-size: 0.85rem !important;
+    }}
+    
+    [data-baseweb="menu"] li:hover {{
+        background-color: {COLOR_LIGHT_GREEN} !important; /* Groene hover */
+    }}
+    /* Einde Selectbox Fix */
+    
+    /* Kaart kader */
+    .st-emotion-cache-1ftvs10 {{ /* streamlit-folium container */
+        border: 1px solid {COLOR_GREY};
+        border-radius: 4px;
+        overflow: hidden;
+    }}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -549,7 +469,7 @@ with tab1:
         
         
         # Display map - breder gemaakt voor betere oriëntatie
-        map_data = st_folium(m, width=700, height=600, returned_objects=["last_object_clicked"])
+        st_folium(m, width=700, height=600, returned_objects=["last_object_clicked"])
         
         # Handle map clicks
         if map_data and map_data.get('last_object_clicked'):
@@ -579,11 +499,9 @@ with tab1:
                 for covenant in covenants_list:
                     if covenant in signed:
                         # Succes: Groen
-                        # ICON PARAMETER VERWIJDERD
                         st.success(f"✅ {covenant}")
                     else:
                         # Geen match: Neutraal/Error
-                        # ICON PARAMETER VERWIJDERD
                         st.error(f"❌ {covenant}")
             else:
                 st.info("Geen manifesten gevonden")
