@@ -579,10 +579,12 @@ with tab1:
                 for covenant in covenants_list:
                     if covenant in signed:
                         # Succes: Groen
-                        st.success(f"✅ {covenant}", icon=" ")
+                        # ICON PARAMETER VERWIJDERD
+                        st.success(f"✅ {covenant}")
                     else:
                         # Geen match: Neutraal/Error
-                        st.error(f"❌ {covenant}", icon=" ")
+                        # ICON PARAMETER VERWIJDERD
+                        st.error(f"❌ {covenant}")
             else:
                 st.info("Geen manifesten gevonden")
         else:
@@ -642,7 +644,7 @@ with tab2:
                 tiles="OpenStreetMap"
             )
             
-            # Add gemeenten with highlighting (Kleurlogica aangepast)
+            # Add gemeenten with highlighting (Kleurlogica aangepast, Python commentaar gebruikt)
             for feature in gemeenten_data['features']:
                 gov_name = feature['properties']['name']
                 is_highlighted = gov_name in matching_govs
@@ -650,7 +652,7 @@ with tab2:
                 GeoJson(
                     feature,
                     style_function=lambda x, highlighted=is_highlighted: {
-                        'fillColor': COLOR_GREEN if highlighted else '#dddddd', 
+                        'fillColor': COLOR_GREEN if highlighted else '#dddddd', # Groen bij highlight
                         'color': COLOR_DARK_GREEN if highlighted else '#999999',
                         'weight': 3 if highlighted else 1,
                         'fillOpacity': 0.6 if highlighted else 0.2
@@ -661,7 +663,7 @@ with tab2:
                     )
                 ).add_to(m2)
             
-            # Add provincies with highlighting (Kleurlogica aangepast)
+            # Add provincies with highlighting (Kleurlogica aangepast, Python commentaar gebruikt)
             for feature in provincies_data['features']:
                 gov_name = feature['properties']['name']
                 is_highlighted = gov_name in matching_govs
@@ -669,7 +671,7 @@ with tab2:
                 GeoJson(
                     feature,
                     style_function=lambda x, highlighted=is_highlighted: {
-                        'fillColor': COLOR_GREEN if highlighted else '#eeeeee',
+                        'fillColor': COLOR_GREEN if highlighted else '#eeeeee', # Groen bij highlight
                         'color': COLOR_DARK_GREEN if highlighted else '#aaaaaa',
                         'weight': 4 if highlighted else 2,
                         'fillOpacity': 0.5 if highlighted else 0.15
@@ -680,7 +682,7 @@ with tab2:
                     )
                 ).add_to(m2)
             
-            # Add waterschappen with highlighting (Kleurlogica aangepast)
+            # Add waterschappen with highlighting (Kleurlogica aangepast, Python commentaar gebruikt)
             for feature in waterschappen_data['features']:
                 gov_name = feature['properties']['name']
                 is_highlighted = gov_name in matching_govs
@@ -688,7 +690,7 @@ with tab2:
                 GeoJson(
                     feature,
                     style_function=lambda x, highlighted=is_highlighted: {
-                        'fillColor': COLOR_GREEN if highlighted else '#f0f0f0',
+                        'fillColor': COLOR_GREEN if highlighted else '#f0f0f0', # Groen bij highlight
                         'color': COLOR_DARK_GREEN if highlighted else '#bbbbbb',
                         'weight': 3 if highlighted else 1,
                         'fillOpacity': 0.5 if highlighted else 0.15,
